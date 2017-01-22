@@ -75,24 +75,22 @@ int main( int argc, char** argv )
 	  break;
         }
 
-      
-      Mat imgHSV;
+      //Declare some Mat objects
+      Mat imgHSV, imgThresholded;
 
       //Convert the captured frame from BGR to HSV
-      cvtColor(imgOriginal, imgHSV, COLOR_BGR2HSV); 
- 
-      Mat imgThresholded;
+      cvtColor(imgOriginal, imgHSV, COLOR_BGR2HSV);
 
       //Threshold the image
-      inRange(imgHSV, Scalar(iLowH, iLowS, iLowV), Scalar(iHighH, iHighS, iHighV), imgThresholded); 
+      inRange( imgHSV, Scalar(iLowH, iLowS, iLowV), Scalar(iHighH, iHighS, iHighV), imgThresholded); 
       
       //morphological opening (removes small objects from the foreground)
-      erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
+      erode( imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
       dilate( imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) ); 
 
       //morphological closing (removes small holes from the foreground)
       dilate( imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) ); 
-      erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
+      erode( imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
 
 
       //#####################################//
@@ -127,9 +125,13 @@ int main( int argc, char** argv )
       //Mat drawing = Mat::zeros( imgThresholded.size(), CV_8UC3 );
       for( unsigned int i = 0; i< contours.size(); i++ )
 	{
+	  // currently random colors             R                   G                   B
 	  Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
-	  drawContours( imgThresholded, contours_poly, i, color, 1, 8, vector<Vec4i>(), 0, Point() );	  
+	  
+	  drawContours( imgThresholded, contours_poly, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
+	  
 	  rectangle( imgThresholded, boundRect[i].tl(), boundRect[i].br(), color, 2, 8, 0 );
+	  
 	  circle( imgThresholded, center[i], (int)radius[i], color, 2, 8, 0 );
 	}
       
@@ -162,7 +164,7 @@ int main( int argc, char** argv )
 	}
       
       // print to console
-      cout << "X : " << iLastX << " Y : " << iLastY << "\n";     
+      cout << "X : " << iLastX << " Y : " << iLastY << "\n";
 
 
       //#####################################//
@@ -172,8 +174,8 @@ int main( int argc, char** argv )
       //#####################################//
       imshow("Thresholded Image", imgThresholded); //show the thresholded image
       imgOriginal += imgLines;                     //transpose imglines
-      imshow("Original", imgOriginal);             //show the original image 
-
+      imshow("Original", imgOriginal);             //show the original image
+      
       //wait for 'esc' key press for 30ms. If 'esc' key is pressed, break loop
       if (waitKey(30) == 27) 
 	{
