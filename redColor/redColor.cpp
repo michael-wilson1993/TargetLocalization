@@ -12,7 +12,7 @@ RNG rng(12345);
 int main( int argc, char** argv )
 {
   // capture the video from webcam
-  VideoCapture cap(0); 
+  VideoCapture cap(1); 
 
   // if not success, exit program
   if ( !cap.isOpened() )  
@@ -26,17 +26,17 @@ int main( int argc, char** argv )
 
   // presets for my testing
   // (very accurate atleast for my light) 
-  int iLowH = 0;
-  int iHighH = 9;
+  int iLowH = 0; // 0
+  int iHighH = 179; // 9
 
-  int iLowS = 111; 
-  int iHighS = 209;
+  int iLowS = 191; // 111
+  int iHighS = 255; // 209
 
-  int iLowV = 89;
-  int iHighV = 255;
+  int iLowV = 4; // 89
+  int iHighV = 150; // 255
 
-  int thresh = 100;
-  int max_thresh = 255;
+  int thresh = 158; // 100
+  int max_thresh = 255; // 255
 
   // Create trackbars in "Control" window
   createTrackbar("LowH", "Control", &iLowH, 179); //Hue (0 - 179)
@@ -49,7 +49,8 @@ int main( int argc, char** argv )
   createTrackbar("HighV", "Control", &iHighV, 255);
 
   // For control of Circle Threshold
-  createTrackbar( " Threshold", "Control", &thresh, max_thresh);
+  createTrackbar( "Threshold", "Control", &thresh, 255);
+  createTrackbar( "Max-Threshold", "Control", &max_thresh, 255);
 
   int iLastX = -1; 
   int iLastY = -1;
@@ -104,10 +105,14 @@ int main( int argc, char** argv )
       // Detect edges using Threshold
       threshold( imgThresholded, imgThresholded, thresh, 255, THRESH_BINARY );
 
+      HoughCircles(imgThresholded, contours, CV_HOUGH_GRADIENT, 2, 50, 200, 100, 25, 100);
+      
+      
       // Find contours
       findContours( imgThresholded, contours, hierarchy, CV_RETR_TREE,
 		    CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
-
+      
+     
       // Approximate contours to polygons + get bounding rects and circles
       vector<vector<Point> > contours_poly( contours.size() );
       vector<Rect> boundRect( contours.size() );
@@ -116,15 +121,18 @@ int main( int argc, char** argv )
 
       for( unsigned int i = 0; i < contours.size(); i++ )
 	{
+	   
 	  approxPolyDP( Mat(contours[i]), contours_poly[i], 3, true );
 	  boundRect[i] = boundingRect( Mat(contours_poly[i]) );
 	  minEnclosingCircle( (Mat)contours_poly[i], center[i], radius[i] );
+	  
 	}
 
       // Draw polygonal contour + bonding rects + circles
       //Mat drawing = Mat::zeros( imgThresholded.size(), CV_8UC3 );
       for( unsigned int i = 0; i< contours.size(); i++ )
 	{
+	  
 	  // currently random colors             R                   G                   B
 	  Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
 	  
