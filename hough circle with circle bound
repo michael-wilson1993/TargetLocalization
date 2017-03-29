@@ -1,0 +1,7 @@
+ cv::GaussianBlur( imgThresolded, imgThresolded,cv::Size(5,5),1.5);
+    std::vector<cv::Vec3f>circles;
+  cv::HoughCircles(imgThresolded,circles,CV_HOUGH_GRADIENT,2,50,200,100,25,100);
+  // draw circles
+  std::vector<cv::Vec3f>::const_iterator itc=circles.begin();
+  while (itc!=circles.end()) {
+    cv::circle(imgOriginal,cv::Point((*itc)[0],(*itc)[1]),(*itc)[2],cv::Scalar(255),2);
